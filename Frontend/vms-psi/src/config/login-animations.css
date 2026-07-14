@@ -1,0 +1,134 @@
+/* src/features/auth/styles/login-animations.css */
+
+/* ------------------------------------------------------
+   All animations here ONLY animate `transform` and `opacity`.
+   These two properties are GPU-accelerated (composited),
+   so they never trigger layout/reflow — this is what keeps
+   the whole page smooth even with many animated elements.
+   NEVER animate width/height/top/left/margin here — those
+   are layout-triggering and will cause jank.
+   ------------------------------------------------------ */
+
+@keyframes float-blob-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes float-blob-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-25px, -25px) scale(1.15); }
+}
+
+@keyframes particle-float {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-160px) translateX(20px); opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer-text {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+@keyframes grid-drift {
+  from { background-position: 0 0; }
+  to { background-position: 32px 32px; }
+}
+
+@keyframes chip-float-1 {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(-1deg); }
+}
+
+@keyframes chip-float-2 {
+  0%, 100% { transform: translateY(0) rotate(2deg); }
+  50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+@keyframes gear-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dash-flow {
+  to { stroke-dashoffset: -200; }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes ripple-expand {
+  to { transform: scale(3); opacity: 0; }
+}
+
+/* ---------- Utility classes applying the above ---------- */
+
+.anim-blob-1 { animation: float-blob-1 8s ease-in-out infinite; }
+.anim-blob-2 { animation: float-blob-2 10s ease-in-out infinite; }
+.anim-particle { animation: particle-float linear infinite; }
+.anim-fade-in { opacity: 0; animation: fade-in 0.6s ease-out forwards; }
+.anim-shimmer {
+  background-size: 200% auto;
+  animation: shimmer-text 4s linear infinite;
+}
+.anim-pulse-ring { animation: pulse-ring 2.5s infinite; }
+.anim-grid-drift { animation: grid-drift 12s linear infinite; }
+.anim-gear { animation: gear-spin linear infinite; }
+.anim-dash { animation: dash-flow linear infinite; }
+.anim-dot-pulse { animation: dot-pulse 2s infinite; }
+
+.chip-wrap { position: absolute; opacity: 0; animation: fade-in 0.7s ease-out forwards; }
+.chip-inner-1 { animation: chip-float-1 7s ease-in-out infinite; }
+.chip-inner-2 { animation: chip-float-2 8s ease-in-out infinite; }
+
+.ripple-el {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  width: 10px;
+  height: 10px;
+  margin: -5px;
+  animation: ripple-expand 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------
+   CRITICAL ACCESSIBILITY + PERFORMANCE SAFEGUARD:
+   Respect the user's OS-level "reduce motion" preference.
+   If set, kill every animation instantly. This isn't optional —
+   some users get genuinely dizzy/sick from constant motion,
+   and some low-power devices benefit from this too.
+   ------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .anim-blob-1,
+  .anim-blob-2,
+  .anim-particle,
+  .anim-shimmer,
+  .anim-pulse-ring,
+  .anim-grid-drift,
+  .anim-gear,
+  .anim-dash,
+  .anim-dot-pulse,
+  .chip-inner-1,
+  .chip-inner-2 {
+    animation: none !important;
+  }
+  .anim-fade-in {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}
