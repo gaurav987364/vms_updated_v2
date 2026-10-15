@@ -87,24 +87,30 @@ export const RegisterService = async (body: RegisterDataProps) => {
 
       if (field === "email") {
         throw new BadRequestException(
-          `Email "${value}" is already registered.`,
+          "This email is already registered. Please use a different email or try logging in.",
           ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
         );
       } else if (field === "username") {
         throw new BadRequestException(
-          `Username "${value}" is already taken.`,
+          "This username is already taken. Please choose a different username.",
           ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
         );
       } else {
+        // Generic fallback for any other unique constraint
         throw new BadRequestException(
-          `This ${field} is already in use.`,
+          "An account with these credentials already exists. Please try different information.",
           ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
         );
       }
     }
 
+    // Log unexpected errors for debugging
+    console.error("Registration error:", error);
+
     // Re-throw other errors
-    throw error;
+    throw new InternalServerException(
+      "Failed to create user account. Please try again.",
+    );
   }
 };
 
