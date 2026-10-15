@@ -6,12 +6,6 @@ export interface UserDocument extends Document {
   email: string;
   username: string;
   password: string;
-  department?: string;
-  role: string;
-  plantCode?: string;
-  userType: "user" | "supplier";
-  supplierCode?: string;
-  isPaid?: boolean;
   isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -36,45 +30,6 @@ const userSchema = new Schema<UserDocument>(
     password: {
       type: String,
       required: true,
-    },
-    department: {
-      type: String,
-      required: false,
-    },
-    role: {
-      type: String,
-      required: true,
-    },
-    plantCode: {
-      type: String,
-      required: false,
-    },
-    userType: {
-      type: String,
-      enum: ["user", "supplier"],
-      default: "user",
-      required: true,
-    },
-    supplierCode: ({
-      type: String,
-      required: false,
-      unique: true,
-      sparse: true, // Allows null values to be non-unique
-      validate: {
-        validator: function(this: UserDocument, value: string) {
-          // Only required if userType is supplier
-          if (this.userType === "supplier") {
-            return !!(value && value.trim().length > 0);
-          }
-          return true;
-        },
-        message: "Supplier code is required for supplier accounts",
-      },
-    } as SchemaTypeOptions<string>),
-    isPaid: {
-      type: Boolean,
-      default: false,
-      required: false,
     },
     isEmailVerified: {
       type: Boolean,
@@ -107,10 +62,7 @@ userSchema.set("toJSON", {
 });
 
 // Create indexes for better query performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-userSchema.index({ supplierCode: 1 });
-userSchema.index({ userType: 1 });
+// Note: email and username already have indexes from unique: true
 userSchema.index({ createdAt: -1 });
 
 const UserModel = mongoose.model<UserDocument>("User", userSchema);

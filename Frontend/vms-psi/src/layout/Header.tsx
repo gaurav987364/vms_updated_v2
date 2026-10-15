@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
-import { Menu, Bell, ChevronDown, LogOut, User, Settings, ArrowLeft, Home } from "lucide-react"
-// import { useTheme } from "@/context/ThemeContext"
+import { Menu, Bell, ChevronDown, LogOut, User, ArrowLeft, Home, Moon, Sun, Code2 } from "lucide-react"
+import { useTheme } from "@/context/ThemeContext"
 import { useAuth } from "@/context/AuthContext"
 import { useNavigate, useLocation } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -13,7 +13,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-  // const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme } = useTheme()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const initials = user?.name.split(" ").map((n) => n[0]).join("") || "U"
 
   // Check if user is on dashboard (hide back button)
-  const isDashboard = location.pathname === "/common/dashboard"
+  const isDashboard = location.pathname === "/dashboard"
 
   // for online offline status indicator
   const getStatusColor = () => {
@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   // Navigate to dashboard
   const handleLogoClick = () => {
-    navigate("/common/dashboard")
+    navigate("/dashboard")
   }
 
   // Navigate back
@@ -73,7 +73,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       <div className="flex items-center gap-3.5">
         <button
           onClick={onMenuClick}
-          className="text-[var(--color-sidebar-text)] hover:text-white transition-colors cursor-pointer"
+          className="text-[var(--color-sidebar-text)] hover:text-[#ff6b35] transition-colors cursor-pointer"
           aria-label="Toggle sidebar"
         >
           <Menu size={25} />
@@ -81,19 +81,21 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
         <button
           onClick={handleLogoClick}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+          className="flex items-center gap-2.5 hover:opacity-90 transition-all cursor-pointer group"
           aria-label="Go to dashboard"
           title="Go to Dashboard"
         >
-          <img
-            loading="lazy"
-            src="/PS_logo_dark_theme_fix.png"
-            alt="Premier Seals VMS"
-            className="h-35 w-35 object-contain"
-          />
-          {/* <span className="hidden md:block text-white font-semibold text-sm truncate">
-            Premier Seals VMS
-          </span> */}
+          <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#ff6b35] to-[#f77f00] flex items-center justify-center text-white text-[12.5px] font-bold shadow-[0_4px_10px_rgba(255,107,53,0.35)] shrink-0 group-hover:scale-105 transition-transform">
+            <Code2 size={20} />
+          </div>
+          <div className="leading-tight hidden sm:block">
+            <p className="text-white text-[14px] font-bold m-0 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              DSA Tracker
+            </p>
+            <p className="text-[#ff6b35] text-[9.5px] tracking-wider m-0 font-semibold">
+              MASTER DSA
+            </p>
+          </div>
         </button>
       </div>
 
@@ -130,13 +132,14 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </button>
 
         {/* Theme toggle */}
-        {/* <button
+        <button
           onClick={toggleTheme}
-          className="text-[var(--color-sidebar-text)] hover:text-white transition-colors"
+          className="text-[var(--color-sidebar-text)] hover:text-[#ff6b35] transition-all duration-200 cursor-pointer p-2 rounded-lg hover:bg-[#ff6b35]/10 border border-transparent hover:border-[#ff6b35]/20"
           aria-label="Toggle theme"
+          title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
         >
           {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
-        </button> */}
+        </button>
 
         <div className="relative" ref={menuRef}>
           <button
@@ -144,9 +147,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             className="flex items-center gap-2 outline-none cursor-pointer rounded-lg px-2 py-1.5 hover:bg-white/5 transition-all duration-200 group"
           >
             <div className="relative">
-              <Avatar className="border-2 border-transparent group-hover:border-[var(--color-primary)]/40 transition-all duration-200">
+              <Avatar className="border-2 border-transparent group-hover:border-[#ff6b35]/40 transition-all duration-200">
                 <AvatarImage src="" />
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-[var(--color-primary)] text-white font-semibold">
+                <AvatarFallback className="bg-gradient-to-br from-[#ff6b35] to-[#f77f00] text-white font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -180,12 +183,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             }`}
           >
             {/* User Info Section */}
-            <div className="px-4 py-3 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-b border-[var(--color-border)]">
+            <div className="px-4 py-3 bg-gradient-to-br from-[#ff6b35]/10 to-transparent border-b border-[var(--color-border)]">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <Avatar className="w-12 h-12 border-2 border-[var(--color-primary)]/30">
+                  <Avatar className="w-12 h-12 border-2 border-[#ff6b35]/30">
                     <AvatarImage src="" />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-[var(--color-primary)] text-white font-semibold">
+                    <AvatarFallback className="bg-gradient-to-br from-[#ff6b35] to-[#f77f00] text-white font-semibold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -211,30 +214,14 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   setMenuOpen(false)
                   navigate("/profile")
                 }}
-                className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-primary)]/5 transition-colors flex items-center gap-3 group cursor-pointer"
+                className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text-primary)] hover:bg-[#ff6b35]/5 transition-colors flex items-center gap-3 group cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center group-hover:bg-[var(--color-primary)]/20 transition-colors">
-                  <User size={16} className="text-[var(--color-primary)]" />
+                <div className="w-8 h-8 rounded-lg bg-[#ff6b35]/10 flex items-center justify-center group-hover:bg-[#ff6b35]/20 transition-colors">
+                  <User size={16} className="text-[#ff6b35]" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium">Profile</p>
                   <p className="text-xs text-[var(--color-text-secondary)]">View your profile</p>
-                </div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setMenuOpen(false)
-                  navigate("/settings")
-                }}
-                className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-primary)]/5 transition-colors flex items-center gap-3 group cursor-pointer"
-              >
-                <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center group-hover:bg-[var(--color-primary)]/20 transition-colors">
-                  <Settings size={16} className="text-[var(--color-primary)]" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">Settings</p>
-                  <p className="text-xs text-[var(--color-text-secondary)]">Manage preferences</p>
                 </div>
               </button>
             </div>

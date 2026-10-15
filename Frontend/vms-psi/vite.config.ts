@@ -10,6 +10,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    port: 5173,
+    strictPort: false, // Allow Vite to use next available port if 5173 is busy
+    host: true,
+    open: true, // Auto-open browser
+  },
   build: {
     rollupOptions: {
       input: {

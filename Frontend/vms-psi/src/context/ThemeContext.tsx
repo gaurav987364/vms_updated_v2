@@ -12,12 +12,14 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-const STORAGE_KEY = "vms-theme"
+const STORAGE_KEY = "dsa-sheet-theme"
 
 /**
  * ThemeProvider
  * ------------------------------------------------------
- * Controls light/dark theme app-wide.
+ * Controls light/dark theme app-wide using Orange/White/Black color scheme.
+ * - Light theme: White background with orange accents
+ * - Dark theme: Black background with orange accents
  * - Reads saved preference from localStorage on load
  * - Applies it via data-theme attribute on <html>, which
  *   styleConfig.css uses to swap CSS variable values

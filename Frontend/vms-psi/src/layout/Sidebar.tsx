@@ -2,17 +2,15 @@ import { useState, useRef, useEffect } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import {
   LayoutDashboard,
-  Users,
-  Building2,
-  FileText,
-  ShoppingCart,
-  Receipt,
-  ShieldCheck,
+  Code2,
+  Calendar,
+  TrendingUp,
   Search,
   X,
   User,
   LogOut,
   ChevronUp,
+  BookOpen,
 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -26,38 +24,20 @@ interface SidebarProps {
 /**
  * navGroups
  * ------------------------------------------------------
- * Config-driven nav — grouped by section, matching the same
- * pattern as dashboardTiles.config.tsx. To add a new module:
- * add one object to the right group's `items` array. Never
- * touch the render logic below.
- *
- * `badgeCount` is optional and static for now — wire it to
- * real data (e.g. pending PO count from a query) later.
+ * DSA Sheet Tracker Navigation
+ * Simple and focused navigation for DSA preparation
  * ------------------------------------------------------
  */
 const navGroups = [
   {
-    label: "Overview",
-    items: [{ label: "Dashboard", icon: LayoutDashboard, path: "/common/dashboard" }],
-  },
-  {
-    label: "Procurement",
+    label: "Main",
     items: [
-      { label: "Vendors", icon: Building2, path: "/common/vendors" },
-      { label: "Users", icon: Users, path: "/common/users" },
-      { label: "Contracts", icon: FileText, path: "/common/contracts" },
+      { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { label: "Topics", icon: BookOpen, path: "/topics" },
+      { label: "DSA Sheet", icon: Code2, path: "/dsa-sheet" },
+      { label: "Calendar", icon: Calendar, path: "/calendar" },
+      { label: "Progress", icon: TrendingUp, path: "/progress" },
     ],
-  },
-  {
-    label: "Finance",
-    items: [
-      { label: "Purchase Orders", icon: ShoppingCart, path: "/common/purchase-orders", badgeCount: 3 },
-      { label: "Invoices", icon: Receipt, path: "/common/invoices" },
-    ],
-  },
-  {
-    label: "System",
-    items: [{ label: "Audit Log", icon: ShieldCheck, path: "/common/audit-log" }],
   },
 ]
 
@@ -134,31 +114,30 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         className={`
           fixed left-0 top-0 z-50 h-screen flex flex-col
           w-[var(--sidebar-width)]
-          bg-gradient-to-b from-[var(--color-sidebar-bg)] to-[#0a1122]
-          border-r border-white/[0.06]
+          bg-gradient-to-b from-black via-zinc-950 to-black
+          border-r border-[#ff6b35]/10
           transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
       >
         {/* ---------- Logo + close button ---------- */}
         <div
-          className="flex items-center justify-between px-4 border-b border-white/10 shrink-0"
+          className="flex items-center justify-between px-4 border-b border-[#ff6b35]/10 shrink-0"
           style={{ height: "var(--header-height)" }}
         >
-          {/* <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-blue-400 to-[var(--color-primary)] flex items-center justify-center text-white text-[12.5px] font-bold shadow-[0_4px_10px_rgba(37,99,235,0.35)] shrink-0">
-              PS
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#ff6b35] to-[#f77f00] flex items-center justify-center text-white text-[12.5px] font-bold shadow-[0_4px_10px_rgba(255,107,53,0.35)] shrink-0">
+              <Code2 size={20} />
             </div>
             <div className="leading-tight">
-              <p className="text-white text-[13px] font-semibold m-0">Premier Seals</p>
-              <p className="text-[#4b5a7a] text-[9.5px] tracking-wide m-0">VMS WORKSPACE</p>
+              <p className="text-white text-[14px] font-bold m-0 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">DSA Tracker</p>
+              <p className="text-[#ff6b35] text-[9.5px] tracking-wider m-0 font-semibold">MASTER DSA</p>
             </div>
-          </div> */}
-          <img loading="lazy" src="/PS_logo_dark_theme_fix.png" alt="Psi Vms" className="h-35 w-35 object-contain" />
+          </div>
 
           <button
             onClick={onClose}
-            className="text-[#4b5a7a] hover:text-white transition-colors cursor-pointer"
+            className="text-gray-400 hover:text-[#ff6b35] transition-colors cursor-pointer"
             aria-label="Close sidebar"
           >
             <X size={18} />
@@ -166,17 +145,17 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         </div>
 
         {/* ---------- Quick search ---------- */}
-        <div className="px-3 pt-4 pb-1 shrink-0">
-          <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] rounded-[10px] px-2.5 py-2 focus-within:border-[var(--color-primary)]/50 transition-colors">
-            <Search size={14} className="text-[#4b5a7a] shrink-0" />
+        <div className="px-3 pt-4 pb-3 shrink-0">
+          <div className="flex items-center gap-2 bg-white/[0.04] border border-[#ff6b35]/20 rounded-lg px-3 py-2.5 focus-within:border-[#ff6b35] focus-within:bg-[#ff6b35]/5 focus-within:shadow-lg focus-within:shadow-[#ff6b35]/10 transition-all">
+            <Search size={15} className="text-[#ff6b35] shrink-0" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Quick search..."
-              className="bg-transparent outline-none text-[12px] text-white placeholder:text-[#4b5a7a] w-full"
+              placeholder="Search navigation..."
+              className="bg-transparent outline-none text-[12px] text-white placeholder:text-gray-500 w-full"
             />
             {!search && (
-              <span className="text-[9.5px] text-[#3d4a63] border border-white/[0.08] rounded px-1 shrink-0">
+              <span className="text-[9.5px] text-[#ff6b35] border border-[#ff6b35]/30 rounded px-1.5 py-0.5 shrink-0 font-medium">
                 ⌘K
               </span>
             )}
@@ -184,81 +163,93 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         </div>
 
         {/* ---------- Nav groups ---------- */}
-        <nav className="flex-1 overflow-y-auto px-2 py-2">
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
           {filteredGroups.length === 0 ? (
-            <p className="text-center text-[12px] text-[#4b5a7a] py-6">No matching modules</p>
+            <p className="text-center text-[12px] text-gray-500 py-6">No matching items</p>
           ) : (
-            filteredGroups.map((group) => (
-              <div key={group.label} className="mb-1">
-                <p className="text-[10px] font-semibold text-[#3d4a63] uppercase tracking-wider px-3 pt-3 pb-1.5">
-                  {group.label}
-                </p>
-                {group.items.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={onClose} // auto-close sidebar after navigating
-                    className={({ isActive }) =>
-                      `relative flex items-center gap-3 px-2.5 py-2 rounded-[11px] text-[13px] font-medium transition-colors cursor-pointer ${
-                        isActive
-                          ? "text-white bg-gradient-to-r from-[var(--color-primary)]/20 to-[var(--color-primary)]/5"
-                          : "text-[#8b9bc2] hover:bg-white/[0.05] hover:text-[#dbe4f5]"
-                      }`
-                    }
-                  >
-                    {({ isActive }) => (
-                      <>
-                        {/* Glowing left accent bar — only on the active item */}
-                        {isActive && (
-                          <span className="absolute -left-2 top-[5px] bottom-[5px] w-[3px] rounded-full bg-gradient-to-b from-blue-400 to-[var(--color-primary)] shadow-[0_0_8px_rgba(96,165,250,0.6)]" />
-                        )}
-
-                        {/* Icon tile — fills solid + glows when active, subtle bg otherwise */}
-                        <span
-                          className={`w-7 h-7 rounded-[8px] flex items-center justify-center shrink-0 transition-colors ${
+            filteredGroups.map((group, groupIndex) => (
+              <div key={group.label} className={groupIndex > 0 ? "mt-6" : ""}>
+                <div className="flex items-center gap-2 px-2 pb-3">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#ff6b35]/20" />
+                  <p className="text-[10px] font-semibold text-[#ff6b35]/70 uppercase tracking-wider">
+                    {group.label}
+                  </p>
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#ff6b35]/20" />
+                </div>
+                <div className="space-y-1">
+                  {group.items.map((item, index) => (
+                    <div key={item.path}>
+                      <NavLink
+                        to={item.path}
+                        onClick={onClose} // auto-close sidebar after navigating
+                        className={({ isActive }) =>
+                          `relative flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all cursor-pointer border ${
                             isActive
-                              ? "bg-[var(--color-primary)] shadow-[0_2px_8px_rgba(59,130,246,0.4)]"
-                              : "bg-white/[0.04]"
-                          }`}
-                        >
-                          <item.icon
-                            size={16}
-                            className={isActive ? "text-white" : "text-current"}
-                          />
-                        </span>
+                              ? "text-white bg-gradient-to-r from-[#ff6b35]/20 to-[#f77f00]/10 border-[#ff6b35]/30 shadow-lg shadow-[#ff6b35]/5"
+                              : "text-gray-400 hover:bg-white/[0.05] hover:text-white border-transparent hover:border-[#ff6b35]/10"
+                          }`
+                        }
+                      >
+                        {({ isActive }) => (
+                          <>
+                            {/* Glowing left accent bar — only on the active item */}
+                            {isActive && (
+                              <span className="absolute -left-3 top-[8px] bottom-[8px] w-[3px] rounded-full bg-gradient-to-b from-[#ff6b35] to-[#f77f00] shadow-[0_0_8px_rgba(255,107,53,0.6)]" />
+                            )}
 
-                        <span className="truncate flex-1">{item.label}</span>
+                            {/* Icon tile — fills solid + glows when active, subtle bg otherwise */}
+                            <span
+                              className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-all ${
+                                isActive
+                                  ? "bg-gradient-to-br from-[#ff6b35] to-[#f77f00] shadow-[0_2px_8px_rgba(255,107,53,0.4)]"
+                                  : "bg-white/[0.04] hover:bg-white/[0.08]"
+                              }`}
+                            >
+                              <item.icon
+                                size={18}
+                                className={isActive ? "text-white" : "text-gray-400"}
+                              />
+                            </span>
 
-                        {/* Badge count — only rendered when provided */}
-                        {typeof item.badgeCount === "number" && item.badgeCount > 0 && (
-                          <span className="bg-gradient-to-br from-amber-500 to-amber-600 text-white text-[9.5px] font-bold px-1.5 py-0.5 rounded-full shadow-[0_2px_6px_rgba(217,119,6,0.4)] shrink-0">
-                            {item.badgeCount > 99 ? "99+" : item.badgeCount}
-                          </span>
+                            <span className="truncate flex-1 font-medium">{item.label}</span>
+
+                            {/* Badge count — only rendered when provided */}
+                            {typeof item.badgeCount === "number" && item.badgeCount > 0 && (
+                              <span className="bg-gradient-to-br from-[#ff6b35] to-[#f77f00] text-white text-[9.5px] font-bold px-1.5 py-0.5 rounded-full shadow-[0_2px_6px_rgba(255,107,53,0.4)] shrink-0">
+                                {item.badgeCount > 99 ? "99+" : item.badgeCount}
+                              </span>
+                            )}
+                          </>
                         )}
-                      </>
-                    )}
-                  </NavLink>
-                ))}
+                      </NavLink>
+
+                      {/* Divider between items (except after last item) */}
+                      {index < group.items.length - 1 && (
+                        <div className="h-px bg-gradient-to-r from-transparent via-[#ff6b35]/10 to-transparent my-1" />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             ))
           )}
         </nav>
 
         {/* ---------- Profile footer with dropdown ---------- */}
-        <div className="px-2 pb-3 pt-2 border-t border-white/[0.07] shrink-0 relative" ref={profileMenuRef}>
+        <div className="px-2 pb-3 pt-2 border-t border-[#ff6b35]/10 shrink-0 relative" ref={profileMenuRef}>
           <button
             onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-            className="w-full flex items-center gap-2.5 rounded-xl p-2 bg-white/[0.03] hover:bg-white/[0.08] transition-all duration-200 cursor-pointer group relative"
+            className="w-full flex items-center gap-2.5 rounded-xl p-2 bg-white/[0.03] hover:bg-[#ff6b35]/10 border border-transparent hover:border-[#ff6b35]/20 transition-all duration-200 cursor-pointer group relative"
           >
-            <span className="relative w-10 h-10 rounded-full p-[2px] bg-gradient-to-br from-blue-400 to-teal-300 shrink-0">
+            <span className="relative w-10 h-10 rounded-full p-[2px] bg-gradient-to-br from-[#ff6b35] to-[#f77f00] shrink-0">
               <Avatar size="default" className="w-full h-full">
                 <AvatarImage src="" />
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-[var(--color-primary)] text-white font-semibold">
+                <AvatarFallback className="bg-gradient-to-br from-[#ff6b35] to-[#f77f00] text-white font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <span
-                className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${getStatusColor()} border-2 border-[#0a1122] transition-colors duration-300`}
+                className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${getStatusColor()} border-2 border-black transition-colors duration-300`}
                 title={!isOnline ? "Offline" : connectionQuality === "poor" ? "Slow connection" : "Connected"}
               />
             </span>
@@ -266,13 +257,13 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               <p className="text-[12px] text-white font-medium m-0 truncate">
                 {user?.name ?? "Guest"}
               </p>
-              <p className="text-[10px] text-[#4b5a7a] m-0 truncate">
+              <p className="text-[10px] text-gray-400 m-0 truncate">
                 {user?.email ?? "Not signed in"}
               </p>
             </span>
             <ChevronUp
               size={16}
-              className={`text-[#4b5a7a] group-hover:text-white shrink-0 transition-all duration-200 ${
+              className={`text-gray-400 group-hover:text-[#ff6b35] shrink-0 transition-all duration-200 ${
                 profileMenuOpen ? "rotate-180" : ""
               }`}
             />
@@ -280,7 +271,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
           {/* Profile Dropdown Menu */}
           <div
-            className={`absolute bottom-full left-2 right-2 mb-2 bg-[#0d1829] border border-white/[0.1] rounded-xl shadow-2xl overflow-hidden transition-all duration-200 origin-bottom ${
+            className={`absolute bottom-full left-2 right-2 mb-2 bg-zinc-900 border border-[#ff6b35]/20 rounded-xl shadow-2xl overflow-hidden transition-all duration-200 origin-bottom ${
               profileMenuOpen
                 ? "opacity-100 scale-100 translate-y-0"
                 : "opacity-0 scale-95 translate-y-2 pointer-events-none"
@@ -294,32 +285,32 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
                   navigate("/profile")
                   onClose()
                 }}
-                className="w-full text-left px-3 py-2.5 text-sm text-white hover:bg-white/[0.08] transition-colors flex items-center gap-3 group"
+                className="w-full text-left px-3 py-2.5 text-sm text-white hover:bg-[#ff6b35]/10 transition-colors flex items-center gap-3 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)]/20 flex items-center justify-center group-hover:bg-[var(--color-primary)]/30 transition-colors">
-                  <User size={16} className="text-[var(--color-primary)]" color="white"/>
+                <div className="w-8 h-8 rounded-lg bg-[#ff6b35]/20 flex items-center justify-center group-hover:bg-[#ff6b35]/30 transition-colors">
+                  <User size={16} className="text-[#ff6b35]" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-[13px]">Profile</p>
-                  <p className="text-[10px] text-[#4b5a7a]">View your profile</p>
+                  <p className="text-[10px] text-gray-400">View your profile</p>
                 </div>
               </button>
 
-              <div className="my-1 mx-2 border-t border-white/[0.06]" />
+              <div className="my-1 mx-2 border-t border-[#ff6b35]/10" />
 
               <button
                 onClick={() => {
                   setProfileMenuOpen(false)
                   handleLogout()
                 }}
-                className="w-full text-left px-3 py-2.5 text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors flex items-center gap-3 group"
+                className="w-full text-left px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-3 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-[var(--color-danger)]/20 flex items-center justify-center group-hover:bg-[var(--color-danger)]/30 transition-colors">
-                  <LogOut size={16} className="text-[var(--color-danger)]" />
+                <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
+                  <LogOut size={16} className="text-red-400" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-[13px]">Logout</p>
-                  <p className="text-[10px] text-[var(--color-danger)]/70">Sign out of account</p>
+                  <p className="text-[10px] text-red-400/70">Sign out of account</p>
                 </div>
               </button>
             </div>

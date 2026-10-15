@@ -14,6 +14,9 @@ import AppLayout from "@/layout/AppLayout"
 // Lazy load reset password page
 const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"))
 
+// Lazy load forgot password page
+const ForgotPasswordPage = lazy(() => import("@/pages/auth/ForgotPasswordPage"))
+
 // Loading fallback for lazy routes
 const RouteLoader = () => (
   <div className="flex items-center justify-center min-h-screen bg-[var(--color-background)]">
@@ -30,14 +33,12 @@ const RouteLoader = () => (
  * Centralized router configuration using createBrowserRouter (data router API).
  *
  * Route Structure:
- * - /login                     → Public login page
- * - /common                    → Protected routes wrapper
- *   - /common/dashboard        → Dashboard (home)
- *   - /common/users            → Users module
- *   - /common/unauthorized     → 403 page
- *   - /common/*                → 404 page (catch-all for invalid protected routes)
- * - /                          → Redirects to /common/dashboard
- * - /*                         → 404 page (catch-all for invalid root paths)
+ * - /login                     → Public login/signup page
+ * - /reset-password            → Public reset password page
+ * - /                          → Protected routes wrapper
+ *   - /dashboard               → Dashboard (home)
+ *   - /unauthorized            → 403 page
+ *   - /*                       → 404 page (catch-all for invalid routes)
  * ------------------------------------------------------
  */
 export const router = createBrowserRouter([
@@ -45,6 +46,17 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+    errorElement: <ErrorPage />,
+  },
+
+  // Public forgot password route
+  {
+    path: "/forgot-password",
+    element: (
+      <Suspense fallback={<RouteLoader />}>
+        <ForgotPasswordPage />
+      </Suspense>
+    ),
     errorElement: <ErrorPage />,
   },
 
@@ -61,7 +73,7 @@ export const router = createBrowserRouter([
 
   // Protected routes (require authentication)
   {
-    path: "/common",
+    path: "/",
     element: <ProtectedRoute />,
     errorElement: <ErrorPage />,
     children: [
@@ -69,24 +81,21 @@ export const router = createBrowserRouter([
         element: <AppLayout />,       // Header + Sidebar shell
         errorElement: <ErrorPage />,  // Catch errors in layout/modules
         children: [
-          // Redirect /common to /common/dashboard
+          // Redirect / to /dashboard
           { index: true, element: <Navigate to="dashboard" replace /> },
 
-          // All module routes (dashboard, users, vendors, etc.)
+          // All module routes
           ...moduleRoutes,
 
           // Unauthorized access page (403)
           { path: "unauthorized", element: <UnauthorizedPage /> },
 
-          // Catch-all for invalid /common/* routes (404)
+          // Catch-all for invalid routes (404)
           { path: "*", element: <NotFoundPage /> },
         ],
       },
     ],
   },
-
-  // Root redirect
-  { path: "/", element: <Navigate to="/common/dashboard" replace /> },
 
   // Catch-all for completely invalid paths (404)
   { path: "*", element: <NotFoundPage /> },

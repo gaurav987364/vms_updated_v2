@@ -31,19 +31,33 @@ export const setupJwtStrategy = (passport: PassportStatic) => {
   passport.use(
     new Strategy(options, async (req, payload: JwtPayload, done) => {
       try {
-        // console.log("🔐 JWT Strategy - Token payload:", payload);
+        console.log("🔐 JWT Strategy - Token payload:", payload);
         const user = await UserService(payload.userId);
 
         if (!user) {
-          // console.log("❌ JWT Strategy - User not found for ID:", payload.userId);
+          console.log("❌ JWT Strategy - User not found for ID:", payload.userId);
           return done(null, false);
         }
 
-        // console.log("✅ JWT Strategy - User authenticated:", user.email);
+        console.log("✅ JWT Strategy - User authenticated:", user.email, "userId:", user._id);
         req.sessionId = payload.sessionId;
-        return done(null, user);
+
+        // Attach user with explicit userId field
+        // Convert to plain object if it's a Mongoose document
+        const userObj = user.toObject ? user.toObject() : user;
+        const userWithId = {
+          ...userObj,
+          userId: user._id?.toString() || user._id,
+        };
+
+        console.log("🔑 User object being attached to req:", {
+          userId: userWithId.userId,
+          email: userWithId.email
+        });
+
+        return done(null, userWithId);
       } catch (error) {
-        // console.error("❌ JWT Strategy - Error:", error);
+        console.error("❌ JWT Strategy - Error:", error);
         return done(error, false);
       }
     }),

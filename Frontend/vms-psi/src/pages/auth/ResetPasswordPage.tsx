@@ -83,10 +83,10 @@ const ResetPasswordPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f1f3a] to-[#1a2942] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-[var(--color-surface)] border-2 border-[var(--color-border)] rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="px-8 pt-8 pb-6 text-center border-b border-[var(--color-border)]">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-[var(--color-primary)] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
+          <div className="px-8 pt-8 pb-6 text-center border-b-2 border-[var(--color-border)] bg-gradient-to-br from-[#ff6b35]/5 to-transparent">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#ff6b35] to-[#f77f00] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#ff6b35]/30">
               <KeyRound className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
@@ -102,18 +102,18 @@ const ResetPasswordPage = () => {
             {success ? (
               // Success State
               <div className="text-center py-4">
-                <div className="w-20 h-20 rounded-full bg-[var(--color-success)]/10 flex items-center justify-center mx-auto mb-4 animate-in zoom-in duration-300">
-                  <CheckCircle2 className="w-10 h-10 text-[var(--color-success)]" />
+                <div className="w-20 h-20 rounded-full bg-[#ff6b35]/10 flex items-center justify-center mx-auto mb-4 animate-in zoom-in duration-300">
+                  <CheckCircle2 className="w-10 h-10 text-[#ff6b35]" />
                 </div>
                 <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-3">
-                  Password Reset Successfully!
+                  Password Reset Successfully! 🎉
                 </h3>
                 <p className="text-sm text-[var(--color-text-secondary)] mb-6">
                   Your password has been updated. Redirecting you to login page...
                 </p>
                 <button
                   onClick={handleRedirectToLogin}
-                  className="w-full px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg font-medium transition-colors cursor-pointer"
+                  className="w-full px-6 py-3 bg-gradient-to-r from-[#ff6b35] to-[#f77f00] text-white rounded-lg font-medium transition-all cursor-pointer hover:shadow-lg hover:shadow-[#ff6b35]/30"
                 >
                   Go to Login Now
                 </button>
@@ -215,7 +215,7 @@ const ResetPasswordPage = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting || !verificationCode}
-                  className="w-full px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full px-6 py-3 bg-gradient-to-r from-[#ff6b35] to-[#f77f00] text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer hover:shadow-lg hover:shadow-[#ff6b35]/30 transform hover:-translate-y-0.5 active:translate-y-0"
                 >
                   {isSubmitting ? (
                     <>
@@ -231,7 +231,7 @@ const ResetPasswordPage = () => {
                 <button
                   type="button"
                   onClick={handleRedirectToLogin}
-                  className="w-full text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors cursor-pointer"
+                  className="w-full text-sm text-[var(--color-text-secondary)] hover:text-[#ff6b35] transition-colors cursor-pointer"
                 >
                   Back to Login
                 </button>
@@ -242,7 +242,7 @@ const ResetPasswordPage = () => {
 
         {/* Footer */}
         <p className="text-center text-xs text-gray-400 mt-6">
-          © 2026 Premier Seals VMS. All rights reserved.
+          © 2026 DSA Tracker. All rights reserved.
         </p>
       </div>
     </div>

@@ -52,7 +52,7 @@ interface AlertStackProps {
  */
 export function ThemedAlert({ alert, onDismiss }: ThemedAlertProps) {
   const { id, type, title, description, action, duration = DEFAULT_DURATION } = alert
-  const config = TYPE_CONFIG[type]
+  const config = TYPE_CONFIG[type] || TYPE_CONFIG.info // Fallback to info if type is invalid
   const Icon = config.icon
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

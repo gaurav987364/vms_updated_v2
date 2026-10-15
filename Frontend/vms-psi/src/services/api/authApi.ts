@@ -8,24 +8,23 @@ export interface User {
   _id: string
   email: string
   name: string
-  role?: "admin" | "receptionist" | "security"
+  username: string
   isEmailVerified: boolean
   createdAt: string
   updatedAt: string
 }
 
 export interface LoginRequest {
-  email?: string
-  supplierCode?: string
+  email: string
   password: string
-  loginType: "user" | "supplier"
 }
 
 export interface RegisterRequest {
   email: string
   password: string
+  confirmPassword: string
   name: string
-  role?: "admin" | "receptionist" | "security"
+  username: string
 }
 
 export interface ApiResponse<T> {
@@ -191,22 +190,6 @@ export const authApi = {
       return response.data
     } catch (error: any) {
       throw this.handleError(error)
-    }
-  },
-
-  /**
-   * Check supplier paid status
-   */
-  async checkSupplierStatus(identifier: string): Promise<{ isPaid: boolean }> {
-    try {
-      const response = await axiosInstance.post<{ isPaid: boolean }>(
-        "/auth/supplier/check-status",
-        { identifier }
-      )
-      return response.data
-    } catch (error: any) {
-      // Return false if any error occurs
-      return { isPaid: false }
     }
   },
 

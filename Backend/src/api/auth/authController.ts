@@ -6,6 +6,8 @@ import {
   loginSchema,
   registerSchema,
   resetPasswordSchema,
+  updateProfileSchema,
+  changePasswordSchema,
 } from "./authValidators";
 import {
   ForgotPasswordService,
@@ -14,6 +16,8 @@ import {
   RegisterService,
   RenewAccessTokenService,
   ResetPasswordService,
+  UpdateProfileService,
+  ChangePasswordService,
 } from "./authService";
 import {
   clearAuthenticationCookies,
@@ -139,32 +143,41 @@ const logout = asyncHandler(
   },
 );
 
-// Check supplier paid status
-const checkSupplierStatus = asyncHandler(
+// Update user profile
+const updateProfile = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
-    const { identifier } = req.body; // email or supplierCode
+    const userId = (req as any).user?.userId || (req as any).user?._id;
 
-    // console.log("🔍 [checkSupplierStatus] Received identifier:", identifier);
-
-    if (!identifier) {
-      // console.log("⚠️ [checkSupplierStatus] No identifier provided");
-      return res.status(HTTPSSTATUS.OK).json({
-        isPaid: false,
-      });
+    if (!userId) {
+      throw new UnAuthorizedexception("User not authenticated.");
     }
 
-    // Find supplier by email or supplierCode
-    const supplier = await UserModel.findOne({
-      $or: [
-        { email: identifier, userType: "supplier" },
-        { supplierCode: identifier, userType: "supplier" }
-      ]
-    }).select("isPaid");
+    const body = updateProfileSchema.parse(req.body);
 
-    // console.log("✅ [checkSupplierStatus] Found supplier:", supplier ? `Yes (isPaid: ${supplier.isPaid})` : "No");
+    const { user } = await UpdateProfileService(userId, body);
 
     return res.status(HTTPSSTATUS.OK).json({
-      isPaid: supplier?.isPaid || false,
+      message: "Profile updated successfully.",
+      user,
+    });
+  },
+);
+
+// Change password
+const changePassword = asyncHandler(
+  async (req: Request, res: Response): Promise<any> => {
+    const userId = (req as any).user?.userId || (req as any).user?._id;
+
+    if (!userId) {
+      throw new UnAuthorizedexception("User not authenticated.");
+    }
+
+    const body = changePasswordSchema.parse(req.body);
+
+    const result = await ChangePasswordService(userId, body);
+
+    return res.status(HTTPSSTATUS.OK).json({
+      message: result.message,
     });
   },
 );
@@ -176,5 +189,6 @@ export {
   forgotPassword,
   resetPassword,
   logout,
-  checkSupplierStatus,
+  updateProfile,
+  changePassword,
 };

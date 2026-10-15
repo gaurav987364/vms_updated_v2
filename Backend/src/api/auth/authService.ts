@@ -32,94 +32,60 @@ export interface RegisterDataProps {
   username: string;
   password: string;
   confirmPassword: string;
-  department?: string;
-  role: string;
-  plantCode?: string;
-  userType: "user" | "supplier";
-  supplierCode?: string;
-  isPaid?: boolean;
 }
 
 export interface LoginDataProps {
-  email?: string;
-  supplierCode?: string;
+  email: string;
   password: string;
   userAgent?: string;
-  loginType: "user" | "supplier";
 }
 
 export const RegisterService = async (body: RegisterDataProps) => {
-  const { name, email, username, password, department, role, plantCode, userType, supplierCode, isPaid } = body;
+  const { name, email, username, password } = body;
 
-  if (!name || !email || !username || !password || !role) {
-    throw new Error("All required credentials must be provided.");
+  if (!name || !email || !username || !password) {
+    throw new BadRequestException("All required fields must be provided.");
   }
 
-  // OPTIMIZATION: Run all validation checks in parallel
-  const validationChecks = [
-    UserModel.exists({ email }).then(exists => ({ field: 'email', exists, value: email })),
-    UserModel.exists({ username }).then(exists => ({ field: 'username', exists, value: username }))
-  ];
+  // Check if user already exists - run checks in parallel
+  const [emailExists, usernameExists] = await Promise.all([
+    UserModel.exists({ email }),
+    UserModel.exists({ username })
+  ]);
 
-  // Add supplierCode check only if userType is supplier
-  if (userType === "supplier" && supplierCode) {
-    validationChecks.push(
-      UserModel.exists({ supplierCode }).then(exists => ({ field: 'supplierCode', exists, value: supplierCode }))
+  if (emailExists) {
+    throw new BadRequestException(
+      "User already exists with this email.",
+      ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
     );
   }
 
-  // Run all checks in parallel
-  const results = await Promise.all(validationChecks);
-
-  // Check for conflicts
-  for (const result of results) {
-    if (result.exists) {
-      if (result.field === 'email') {
-        throw new BadRequestException(
-          "User Already Exists with this Email.",
-          ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
-        );
-      } else if (result.field === 'username') {
-        throw new BadRequestException(
-          "Username already taken.",
-          ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
-        );
-      } else if (result.field === 'supplierCode') {
-        throw new BadRequestException(
-          `Supplier code "${result.value}" is already in use.`,
-          ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
-        );
-      }
-    }
+  if (usernameExists) {
+    throw new BadRequestException(
+      "Username already taken.",
+      ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
+    );
   }
 
-  // Create new user with proper error handling
-  let newUser;
+  // Create new user
   try {
-    newUser = await UserModel.create({
+    const newUser = await UserModel.create({
       name,
       email,
       username,
       password,
-      department,
-      role,
-      plantCode,
-      userType,
-      supplierCode: userType === "supplier" ? supplierCode : undefined,
-      isPaid: userType === "supplier" ? (isPaid || false) : undefined,
     });
+
+    return {
+      user: newUser,
+    };
   } catch (error: any) {
     // Handle MongoDB duplicate key errors (race condition fallback)
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern || {})[0];
       const value = error.keyValue?.[field];
 
-      if (field === "supplierCode") {
-        throw new BadRequestException(
-          `Supplier code "${value}" is already in use.`,
-          ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
-        );
-      } else if (field === "email") {
+      if (field === "email") {
         throw new BadRequestException(
           `Email "${value}" is already registered.`,
           ErrorCode.AUTH_EMAIL_ALREADY_EXISTS,
@@ -140,101 +106,50 @@ export const RegisterService = async (body: RegisterDataProps) => {
     // Re-throw other errors
     throw error;
   }
-
-  // get user id
-  const userId = newUser._id;
-
-  //! we have to added the userType in model so we send from frontend and then store the type based on that type we do later things in our system. also there is no verification email sent thing to user coz we are creating the user from our side and give the account for login.
-
-  //create verification code collection based on user id;
-  //   const verificationCode = await VerificationModel.create({
-  //     userId,
-  //     type: VerificationTypes.EMAIL_VERIFICATION,
-  //     expiresAt: AfterFortyFiveMinutes(),
-  //   });
-
-  //send code to user email
-  //   const verificationURL = `${config.APP_ORIGIN}/confirm-account?code=${verificationCode.code}`;
-
-  //using resend
-  //   await sendEmail({
-  //     to: newUser.email,
-  //     ...verifyEmailTemplate(verificationURL),
-  //   });
-
-  return {
-    user: newUser,
-  };
 };
 
 //login
 export const LoginService = async (body: LoginDataProps) => {
-  const { email, supplierCode, password, userAgent, loginType } = body;
+  const { email, password, userAgent } = body;
 
-  let user;
+  // Find user by email
+  const user = await UserModel.findOne({ email });
 
-  // For user login - find by email only
-  if (loginType === "user") {
-    if (!email) {
-      throw new BadRequestException(
-        "Email is required for user login.",
-        ErrorCode.AUTH_USER_NOT_FOUND,
-      );
-    }
-    user = await UserModel.findOne({ email, userType: "user" });
-  }
-  // For supplier login - find by email OR supplierCode
-  else if (loginType === "supplier") {
-    if (supplierCode) {
-      user = await UserModel.findOne({ supplierCode, userType: "supplier" });
-    } else if (email) {
-      user = await UserModel.findOne({ email, userType: "supplier" });
-    } else {
-      throw new BadRequestException(
-        "Email or Supplier Code is required for supplier login.",
-        ErrorCode.AUTH_USER_NOT_FOUND,
-      );
-    }
-  }
-
-  //if there is no any user throw error
   if (!user) {
     throw new NotFoundExeption(
-      "User Not Found.",
+      "User not found.",
       ErrorCode.AUTH_USER_NOT_FOUND,
     );
   }
 
-  // check and verify the password is corrent
+  // Verify password
   const isValidPassword = await user.comparePasswords(password);
 
-  //if password is not match throw error
   if (!isValidPassword) {
     throw new BadRequestException(
-      "Bad Credentials.",
+      "Invalid email or password.",
       ErrorCode.AUTH_USER_NOT_FOUND,
     );
   }
 
-  // DELETE ALL EXISTING SESSIONS FOR THIS USER (single session enforcement)
-  // This ensures only one active session per user at any time
+  // Delete all existing sessions for this user (single session enforcement)
   await SessionModel.deleteMany({
     userId: user._id,
   });
 
-  //if user is found and has valid password we have to create session collection
+  // Create new session
   const session = await SessionModel.create({
     userId: user._id,
     userAgent,
   });
 
-  //after create session collection , create access token
+  // Create access token
   const accessToken = signJwtToken({
     userId: user._id,
     sessionId: session._id,
   });
 
-  // after accestoken we create refresh token
+  // Create refresh token
   const refreshToken = signJwtToken(
     {
       sessionId: session._id,
@@ -416,4 +331,120 @@ export const ResetPasswordService = async (body: any) => {
 //logout-service
 export const LogoutService = async (sessionId: string) => {
   return await SessionModel.findByIdAndDelete(sessionId);
+};
+
+// Update user profile service
+export interface UpdateProfileDataProps {
+  name?: string;
+  username?: string;
+  email?: string;
+}
+
+export const UpdateProfileService = async (
+  userId: string,
+  body: UpdateProfileDataProps
+) => {
+  const { name, username, email } = body;
+
+  // Find user
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new NotFoundExeption("User not found.");
+  }
+
+  // Check if username is being changed and if it's already taken
+  if (username && username !== user.username) {
+    const usernameExists = await UserModel.exists({ username, _id: { $ne: userId } });
+    if (usernameExists) {
+      throw new BadRequestException(
+        "Username is already taken.",
+        ErrorCode.VALIDATION_ERROR
+      );
+    }
+  }
+
+  // Check if email is being changed and if it's already taken
+  if (email && email !== user.email) {
+    const emailExists = await UserModel.exists({ email, _id: { $ne: userId } });
+    if (emailExists) {
+      throw new BadRequestException(
+        "Email is already registered.",
+        ErrorCode.AUTH_EMAIL_ALREADY_EXISTS
+      );
+    }
+  }
+
+  // Update user fields
+  if (name) user.name = name;
+  if (username) user.username = username;
+  if (email) user.email = email;
+
+  await user.save();
+
+  return {
+    user: {
+      _id: user._id,
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+  };
+};
+
+// Change password service
+export interface ChangePasswordDataProps {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export const ChangePasswordService = async (
+  userId: string,
+  body: ChangePasswordDataProps
+) => {
+  const { currentPassword, newPassword } = body;
+
+  // Find user
+  const user = await UserModel.findById(userId).select("+password");
+  if (!user) {
+    throw new NotFoundExeption("User not found.");
+  }
+
+  // Verify current password
+  const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+  if (!isValidPassword) {
+    throw new BadRequestException(
+      "Current password is incorrect.",
+      ErrorCode.AUTH_USER_NOT_FOUND
+    );
+  }
+
+  // Check if new password is different from current
+  const isSamePassword = await bcrypt.compare(newPassword, user.password);
+  if (isSamePassword) {
+    throw new BadRequestException(
+      "New password must be different from current password."
+    );
+  }
+
+  // Validate new password strength (minimum 8 characters)
+  if (newPassword.length < 8) {
+    throw new BadRequestException(
+      "Password must be at least 8 characters long."
+    );
+  }
+
+  // Update password
+  user.password = newPassword;
+  await user.save();
+
+  // Delete all sessions except current one to force re-login on other devices
+  await SessionModel.deleteMany({
+    userId: user._id,
+  });
+
+  return {
+    message: "Password changed successfully. Please login again on other devices.",
+  };
 };

@@ -6,7 +6,8 @@ import {
   registerUser,
   renewAccessToken,
   resetPassword,
-  checkSupplierStatus,
+  updateProfile,
+  changePassword,
 } from "./authController";
 import { authenticateJWT } from "../../services/passportJwt.service";
 
@@ -27,10 +28,13 @@ authRoute.post("/password/forgot", forgotPassword);
 //reset-password
 authRoute.post("/password/reset", resetPassword);
 
-//check supplier paid status
-authRoute.post("/supplier/check-status", checkSupplierStatus);
-
 //logout
 authRoute.post("/logout", authenticateJWT, logout);
+
+//update profile (requires authentication)
+authRoute.put("/profile", authenticateJWT, updateProfile);
+
+//change password (requires authentication)
+authRoute.put("/password/change", authenticateJWT, changePassword);
 
 export default authRoute;

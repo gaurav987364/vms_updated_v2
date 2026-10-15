@@ -1,8 +1,13 @@
 // src/routes/moduleRegistry.ts
 
 import { dashboardRoutes } from "@/pages/dashboard"
-import { usersRoutes } from "@/pages/users"
-import { vendorsRoutes } from "@/pages/vendors"
+import { dsaSheetRoutes } from "@/pages/dsa-sheet"
+import { calendarRoutes } from "@/pages/calendar"
+import { progressRoutes } from "@/pages/progress"
+import { practiceRoutes } from "@/pages/practice"
+import { streakRoutes } from "@/pages/streak"
+import { topicsRoutes } from "@/pages/topics"
+import { profileRoutes } from "@/pages/profile"
 
 /**
  * RULE FOR ALL FUTURE DEVELOPERS:
@@ -15,6 +20,11 @@ import { vendorsRoutes } from "@/pages/vendors"
  */
 export const moduleRoutes = [
   ...dashboardRoutes,
-  ...usersRoutes,
-  ...vendorsRoutes,
+  ...dsaSheetRoutes,
+  ...calendarRoutes,
+  ...progressRoutes,
+  ...practiceRoutes,
+  ...streakRoutes,
+  ...topicsRoutes,
+  ...profileRoutes,
 ]
